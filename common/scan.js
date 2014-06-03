@@ -62,7 +62,7 @@
     new: {
       nodeType: "NewExpression",
       test: function (testNode, node) {
-        if (node.callee.name == testNode.callee.name) {
+        if (node.callee.name == testNode.callee.name ) {
           return true;
         }
       }
