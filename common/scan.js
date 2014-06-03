@@ -63,7 +63,12 @@
       nodeType: "NewExpression",
       test: function (testNode, node) {
         if (node.callee.name == testNode.callee.name) {
-          return true;
+          if(node.arguments.length > 0) {
+            return templateRules.matchArgs(testNode,node); 
+          }
+          else {
+            return true;
+          }
         }
       }
     },
@@ -93,6 +98,32 @@
         }
       }
     },
+    matchObjects:function(testNode, node){
+      var matching = node.properties.length > 0;
+      var index = 0;
+      while(matching && index <testNode.properties.length) {
+        var testArg = testNode.properties[index];
+        if(node.properties[index] == 'undefined') {
+          matching = false;
+        }
+        //ensure object key matches
+        if(testArg.key.type == "Identifier") {
+          if(node.properties[index].key.type != "Identifier" || testArg.key.name != node.properties[index].key.name) {
+            matching = false;
+          }
+        }
+        // ensure object value matches
+        if(testArg.value.type == "Literal") {
+          if(node.properties[index].value.type != "Literal" || testArg.value.value != node.properties[index].value.value) {
+            matching = false;
+          } 
+        }
+        index++;
+      }
+      if(matching) {
+        return true;
+      }
+    },
     matchArgs:function(testNode,node){
       var matching = node.arguments.length > 0;
       var index = 0;
@@ -102,6 +133,14 @@
         if (testArg.type == "Literal") {
           if (typeof node.arguments[index] == 'undefined' || node.arguments[index].type != "Literal" || testArg.value != node.arguments[index].value) {
             matching = false;
+          }
+        }
+        if(testArg.type == "ObjectExpression") {
+          if(node.arguments[index].type != "ObjectExpression") {
+            matching = false;
+          }
+          else { 
+            matching = templateRules.matchObjects(testArg, node.arguments[index]); 
           }
         }
         index++;
