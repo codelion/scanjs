@@ -97,26 +97,10 @@
   },
   {
     "name": "new",
-    "source": "new foo()",
-    "testhit": "new foo();",
-    "testmiss": "foo();",
-    "desc": "Matches over a newExpression with a given name.",
-    "threat": "example"
-  },
-  {
-    "name": "newargs",
-    "source": "new foo(bar, 'baz')",
-    "testhit": "new foo(bar,'baz');",
-    "testmiss": "new foo(); new foo(bar);",
-    "desc": "Same as for new, expect this allow makes sure that any supplied literal arguments are matching (both in value, and in position)",
-    "threat": "example"
-  },
-  {
-    "name": "newobj",
-    "source": "new foo(bar:'baz')",
-    "testhit": "new foo(bar:'baz');",
-    "testmiss": "new foo(); new foo(bar); new foo(bar:'no');",
-    "desc": "Same as for new, expect this allow makes sure that any supplied literal arguments are matching (both in value, and in position)",
+    "source": "new foo({bar:'baz'})",
+    "testhit": "new foo({bar:'baz'});",
+    "testmiss": "foo(); new foo(); new foo(bar);new foo(bar,'baz')",
+    "desc": "Matches over a newExpression with a given name",
     "threat": "example"
   }
 ]
