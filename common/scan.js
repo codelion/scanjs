@@ -63,7 +63,7 @@
       nodeType: "NewExpression",
       test: function (testNode, node) {
         if (node.callee.name == testNode.callee.name) {
-          if(node.arguments.length > 0) {
+          if(testNode.arguments.length > 0) {
             return templateRules.matchArgs(testNode,node); 
           }
           else {
