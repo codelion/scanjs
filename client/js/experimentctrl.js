@@ -1,3 +1,5 @@
+"use strict";
+
 scanjsModule.controller('ExperimentCtrl', ['$scope', 'ScanSvc', function ExperimentCtrl($scope, ScanSvc) {
   if (!document.getElementById("experiment-mirror").children.length) {
     $scope.codeMirror = new CodeMirror(document.getElementById('experiment-mirror'), {
@@ -20,40 +22,50 @@ scanjsModule.controller('ExperimentCtrl', ['$scope', 'ScanSvc', function Experim
     "testmiss": "",
     "desc": "Manual input.",
     "threat": "example"
-  }
+  };
 
   $scope.runScan = function () {
-    $scope.results=[];
-    code = $scope.codeMirror.getValue();
+    $scope.results = [];
+    $scope.error = null;
     ScanJS.loadRules(ScanSvc.rules);
-    $scope.results=ScanJS.scan(code);
-    $scope.lastScan=$scope.runScan;
-  }
-
+    var code = $scope.codeMirror.getValue();
+    try {
+      var ast = acorn.parse(code, { locations: true });
+      $scope.results = ScanJS.scan(ast);
+    } catch(e) {
+      $scope.error = e;
+      console.error(e);
+    }
+    $scope.lastScan = $scope.runScan;
+  };
 
   $scope.runManualScan = function () {
-    ruleData.source=$scope.rule;
+    ruleData.source = $scope.rule;
     ScanJS.loadRules([ruleData]);
 
-    $scope.results=[];
-    code = $scope.codeMirror.getValue();
-    //put ast on global variable for debugging purposes.
-    try{
-      window.ast=acorn.parse(code);
-    }catch(e){
-
+    $scope.results = [];
+    $scope.error = null;
+    var code = $scope.codeMirror.getValue();
+    try {
+      var ast = acorn.parse(code, { locations: true });
+      $scope.results = ScanJS.scan(ast);
+      //put ast on global variable for debugging purposes.
+      window.ast = ast;
+    } catch(e) {
+      $scope.error = e;
+      console.error(e);
     }
-    //ScanJS.setResultCallback(found);
-    $scope.results=ScanJS.scan(code);
-    $scope.lastScan=$scope.runManualScan;
-  }
+    $scope.lastScan = $scope.runManualScan;
+  };
 
   $scope.showResult = function (filename,line, col) {
-    document.querySelector("#code-mirror-wrapper").classList.toggle("hidden",false);
     $scope.codeMirror.setCursor(line - 1, col || 0);
     $scope.codeMirror.focus();
   };
 
+  $scope.add_placeholder_char = function() {
+    $scope.rule += '$_any';
+  }
   $scope.lastScan=$scope.runScan;
   
 }]);

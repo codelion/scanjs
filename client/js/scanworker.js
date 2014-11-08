@@ -1,3 +1,5 @@
+"use strict";
+
 /* this makes sure that console.log can be used, even if it is undefined.
    We won't see the message though, since this kind of postMessage isn't handled in scanservice.js  */
 if (typeof console === "undefined") {
@@ -22,7 +24,10 @@ onmessage = function (evt) {
     var rules;
 
     var file = args[1];
-    var findings = ScanJS.scan(source,file);
+
+    var ast = acorn.parse(source, {locations: true});
+
+    var findings = ScanJS.scan(ast,file);
     postMessage({"filename": file, "findings": findings});
   }
   else if(evt.data.call === 'updateRules'){
